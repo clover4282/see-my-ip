@@ -130,20 +130,20 @@ struct BuyMeCoffeeButton: View {
             guard let url = URL(string: "https://buymeacoffee.com/clover4282") else { return }
             NSWorkspace.shared.open(url)
         } label: {
-            HStack(spacing: compact ? 6 : 8) {
+            HStack(spacing: compact ? 4 : 8) {
                 BuyMeACoffeeLogo()
-                    .frame(width: compact ? 18 : 22, height: compact ? 18 : 22)
+                    .frame(width: compact ? 12 : 22, height: compact ? 12 : 22)
                 Text(compact ? "Coffee" : "Buy me a coffee")
-                    .font(.system(size: compact ? 11 : 13, weight: .semibold))
+                    .font(.system(size: compact ? 10 : 13, weight: .semibold))
             }
-            .padding(.horizontal, compact ? 8 : 12)
-            .padding(.vertical, compact ? 4 : 5)
+            .padding(.horizontal, compact ? 6 : 12)
+            .padding(.vertical, compact ? 2 : 5)
             .foregroundStyle(Color.black.opacity(0.86))
             .background(
                 RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous)
                     .fill(Color(red: 1.0, green: 0.84, blue: 0.12))
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(InteractiveButtonStyle())
     }
 }
