@@ -1,0 +1,46 @@
+name: SeeMyIP
+options:
+  bundleIdPrefix: com.clover4282
+  deploymentTarget:
+    macOS: "14.0"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+
+targets:
+  SeeMyIP:
+    type: application
+    platform: macOS
+    sources:
+      - path: SeeMyIP
+        excludes:
+          - Resources
+    resources:
+      - path: SeeMyIP/Assets.xcassets
+    info:
+      path: SeeMyIP/Resources/Info.plist
+      properties:
+        LSUIElement: true
+        NSAppTransportSecurity:
+          NSExceptionDomains:
+            ip-api.com:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
+    entitlements:
+      path: SeeMyIP/Resources/SeeMyIP.entitlements
+      properties:
+        com.apple.security.network.client: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.clover4282.seemyip
+        PRODUCT_NAME: See My IP
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: NO
+        COMBINE_HIDPI_IMAGES: YES
