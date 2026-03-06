@@ -24,6 +24,8 @@
 	<string>https://clover4282.github.io/see-my-ip/appcast.xml</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
+	<key>SUPublicEDKey</key>
+	<string>EOVhN+2Y4APnxRyU9MPkJPlJ+YgLQfbE9ORT74Zln5k=</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>

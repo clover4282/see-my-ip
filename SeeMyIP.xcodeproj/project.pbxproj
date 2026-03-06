@@ -235,6 +235,7 @@
 			);
 			name = SeeMyIP;
 			packageProductDependencies = (
+				AA1122334455667788990011 /* Sparkle */,
 			);
 			productName = SeeMyIP;
 			productReference = 6E3390F0A7A2628B536EA17D /* SeeMyIP.app */;
@@ -267,6 +268,9 @@
 			productRefGroup = 7B261D43964CEE26F4F6B0C0 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
+			packageReferences = (
+				BB1122334455667788990011 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			targets = (
 				BE87657698EDF6378D7DF907 /* SeeMyIP */,
 			);
@@ -513,6 +517,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BB1122334455667788990011 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA1122334455667788990011 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB1122334455667788990011 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E687CB2C27B50F50DF0DEC8C /* Project object */;
 }

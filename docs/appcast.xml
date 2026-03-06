@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>See My IP</title>
+    <link>https://clover4282.github.io/see-my-ip/appcast.xml</link>
+    <description>See My IP update feed</description>
+    <language>en</language>
+    <item>
+      <title>v0.1</title>
+      <pubDate>Fri, 07 Mar 2026 00:00:00 +0900</pubDate>
+      <sparkle:version>1</sparkle:version>
+      <sparkle:shortVersionString>0.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[
+        <h2>See My IP v0.1</h2>
+        <p>Initial release</p>
+        <ul>
+          <li>Public IP detection with multiple provider fallback</li>
+          <li>Local network interfaces (IPv4/IPv6)</li>
+          <li>GeoLocation (country, city, ISP, timezone)</li>
+          <li>VPN detection</li>
+          <li>IP change history and notifications</li>
+          <li>Customizable menu bar display modes</li>
+          <li>Manual update check via GitHub Releases</li>
+          <li>Power-optimized design</li>
+        </ul>
+      ]]></description>
+      <enclosure url="https://github.com/clover4282/see-my-ip/releases/download/v0.1/SeeMyIP-v0.1.zip"
+                 type="application/octet-stream"
+                 length="295583"
+                 sparkle:edSignature="CGOgmZBpViFna5DZiRZgYQ8RJAzaRL1+nPUdRmK6Z4utuTsxVkYvJvyDa/3CdwRvkGuuhEndaL/p7iIinT4YDQ==" />
+    </item>
+  </channel>
+</rss>
