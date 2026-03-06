@@ -4,72 +4,57 @@ struct LocalIPCardView: View {
     @AppStorage(Constants.UserDefaultsKeys.ipv4Format) private var ipv4Format = "full"
     @AppStorage(Constants.UserDefaultsKeys.ipv6Format) private var ipv6Format = "hidden"
     let interfaces: [NetworkInterface]
-    let copiedText: String?
-    let onCopy: (String) -> Void
-    @State private var isExpanded = true
+    let copiedItemID: String?
+    let onCopy: (String, String?) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    isExpanded.toggle()
-                }
-            } label: {
-                HStack {
-                    Text("Local Network")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.primary)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
-                }
-            }
-            .buttonStyle(.plain)
+            Text("Local Network")
+                .font(.callout)
+                .fontWeight(.semibold)
+                .foregroundStyle(.primary)
 
-            if isExpanded {
-                ForEach(interfaces) { iface in
-                    if let ipv4 = iface.ipv4Address {
-                        interfaceRow(iface: iface, ip: ipv4)
-                    }
-                    if let ipv6 = iface.ipv6Address {
-                        interfaceRow(iface: iface, ip: ipv6, isV6: true)
-                    }
+            ForEach(interfaces) { iface in
+                if let ipv4 = iface.ipv4Address {
+                    interfaceRow(iface: iface, ip: ipv4)
+                }
+                if let ipv6 = iface.ipv6Address {
+                    interfaceRow(iface: iface, ip: ipv6, isV6: true)
                 }
             }
         }
     }
 
     private func interfaceRow(iface: NetworkInterface, ip: String, isV6: Bool = false) -> some View {
-        HStack(spacing: 8) {
+        let itemID = "local:\(iface.name):\(ip)"
+
+        return HStack(spacing: 8) {
             Image(systemName: iface.type.iconName)
                 .frame(width: 16)
                 .foregroundStyle(.secondary)
-                .font(.caption)
+                .font(.callout)
 
             Text(isV6 ? "IPv6" : iface.displayName)
-                .font(.caption)
+                .font(.callout)
                 .foregroundStyle(.secondary)
-                .frame(width: 75, alignment: .leading)
+                .frame(width: 92, alignment: .leading)
                 .lineLimit(1)
 
-            Button { onCopy(ip) } label: {
+            Button { onCopy(ip, itemID) } label: {
                 HStack(spacing: 4) {
                     Text(formattedIP(ip))
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(.primary)
+                        .font(.system(.callout, design: .monospaced))
+                        .interactiveForeground(idle: .primary, hover: .accentColor, pressed: .accentColor)
                         .lineLimit(1)
                         .truncationMode(.middle)
-                    if copiedText == ip {
+                    if copiedItemID == itemID {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.green)
                     }
                 }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(InteractiveButtonStyle())
 
             Spacer()
         }

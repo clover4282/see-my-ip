@@ -6,13 +6,11 @@ import ServiceManagement
 enum AppTab: String, CaseIterable {
     case dashboard
     case history
-    case settings
 
     var icon: String {
         switch self {
         case .dashboard: return "network"
         case .history: return "clock"
-        case .settings: return "gearshape"
         }
     }
 
@@ -20,7 +18,6 @@ enum AppTab: String, CaseIterable {
         switch self {
         case .dashboard: return "Dashboard"
         case .history: return "History"
-        case .settings: return "Settings"
         }
     }
 }
@@ -38,13 +35,14 @@ final class IPDashboardViewModel {
     var isLoading: Bool = false
     var lastUpdated: Date?
     var errorMessage: String?
-    var copiedText: String?
+    var copiedItemID: String?
     var showLocalIPs: Bool = true
     var currentTab: AppTab = .dashboard
     var history: [IPHistoryEntry] = []
 
     // MARK: - Settings (tracked for reactivity)
     var menuBarDisplayModeValue: String = UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.menuBarDisplayMode) ?? "icon"
+    var menuBarLocalInterfaceValue: String = UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.menuBarLocalInterface) ?? Constants.Defaults.autoLocalInterface
 
     // MARK: - Services
     private let publicIPService = PublicIPService()
@@ -53,32 +51,23 @@ final class IPDashboardViewModel {
     private let historyService = IPHistoryService()
 
     private var refreshTask: Task<Void, Never>?
+    private var networkDebounceTask: Task<Void, Never>?
     @ObservationIgnored private var defaultsObserver: Any?
 
     // MARK: - Menu Bar
-    var menuBarIcon: String {
-        if isVPNActive { return "shield.lefthalf.filled" }
-        return networkType.iconName
-    }
-
-    var showsMenuBarIcon: Bool {
-        let mode = MenuBarDisplayMode(rawValue: menuBarDisplayModeValue) ?? .iconOnly
-        return mode == .iconOnly
-    }
-
     var menuBarTitle: String {
         let mode = MenuBarDisplayMode(rawValue: menuBarDisplayModeValue) ?? .iconOnly
         switch mode {
         case .iconOnly:
-            return ""
+            return "IP"
         case .publicIP:
             return publicIP ?? "IP"
         case .publicIPSummary:
             return summarizedIP(publicIP) ?? "IP"
         case .localIP:
-            return primaryLocalIPAddress ?? "IP"
+            return selectedLocalIPAddress ?? "IP"
         case .localIPSummary:
-            return summarizedIP(primaryLocalIPAddress) ?? "IP"
+            return summarizedIP(selectedLocalIPAddress) ?? "IP"
         }
     }
 
@@ -95,7 +84,13 @@ final class IPDashboardViewModel {
 
         localNetworkService.onNetworkChange = { [weak self] in
             Task { @MainActor [weak self] in
-                await self?.refresh()
+                guard let self else { return }
+                self.networkDebounceTask?.cancel()
+                self.networkDebounceTask = Task {
+                    try? await Task.sleep(for: .seconds(2))
+                    guard !Task.isCancelled else { return }
+                    await self.refresh()
+                }
             }
         }
         history = historyService.getHistory()
@@ -111,6 +106,7 @@ final class IPDashboardViewModel {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.menuBarDisplayModeValue = UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.menuBarDisplayMode) ?? "icon"
+                self.menuBarLocalInterfaceValue = UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.menuBarLocalInterface) ?? Constants.Defaults.autoLocalInterface
             }
         }
     }
@@ -169,13 +165,14 @@ final class IPDashboardViewModel {
         lastUpdated = Date()
     }
 
-    func copyToClipboard(_ text: String) {
+    func copyToClipboard(_ text: String, itemID: String? = nil) {
         ClipboardService.copy(text)
-        copiedText = text
+        let copiedID = itemID ?? text
+        copiedItemID = copiedID
         Task {
             try? await Task.sleep(for: .seconds(2))
-            if copiedText == text {
-                copiedText = nil
+            if copiedItemID == copiedID {
+                copiedItemID = nil
             }
         }
     }
@@ -207,7 +204,19 @@ final class IPDashboardViewModel {
         }
     }
 
-    private var primaryLocalIPAddress: String? {
+    private var selectedLocalIPAddress: String? {
+        let selectedInterfaceName = menuBarLocalInterfaceValue
+
+        if selectedInterfaceName != Constants.Defaults.autoLocalInterface,
+           let selectedInterface = localInterfaces.first(where: { $0.name == selectedInterfaceName }) {
+            if let ipv4 = selectedInterface.ipv4Address {
+                return ipv4
+            }
+            if let ipv6 = selectedInterface.ipv6Address {
+                return ipv6
+            }
+        }
+
         for interface in localInterfaces {
             if let ipv4 = interface.ipv4Address {
                 return ipv4

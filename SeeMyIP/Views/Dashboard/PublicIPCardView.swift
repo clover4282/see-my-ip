@@ -6,8 +6,8 @@ struct PublicIPCardView: View {
     let ip: String?
     let geoLocation: GeoLocation?
     let isLoading: Bool
-    let copiedText: String?
-    let onCopy: (String) -> Void
+    let copiedItemID: String?
+    let onCopy: (String, String?) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -28,30 +28,27 @@ struct PublicIPCardView: View {
                 }
                 .padding(.vertical, 8)
             } else if let ip {
-                let isCopied = copiedText == ip
+                let itemID = "public:\(ip)"
+                let isCopied = copiedItemID == itemID
                 let displayIP = formattedIP(ip)
 
-                Button { onCopy(ip) } label: {
+                Button { onCopy(ip, itemID) } label: {
                     HStack {
                         Text(displayIP)
                             .font(.system(.title2, design: .monospaced))
                             .fontWeight(.semibold)
-                            .foregroundStyle(.primary)
+                            .interactiveForeground(idle: .primary, hover: .accentColor, pressed: .accentColor)
                         Spacer()
                         Image(systemName: isCopied ? "checkmark.circle.fill" : "doc.on.doc")
-                            .foregroundStyle(isCopied ? .green : .secondary)
+                            .interactiveForeground(idle: isCopied ? .green : .secondary, hover: isCopied ? .green : .accentColor, pressed: isCopied ? .green : .accentColor)
                             .contentTransition(.symbolEffect(.replace))
                     }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(InteractiveButtonStyle(cornerRadius: 10))
 
                 if let geo = geoLocation {
                     GeoLocationView(location: geo)
                 }
-
-                Text(isCopied ? "Copied!" : "tap to copy")
-                    .font(.caption2)
-                    .foregroundStyle(isCopied ? Color.green : Color.gray.opacity(0.5))
             } else {
                 Text("Unable to determine")
                     .font(.callout)

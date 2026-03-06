@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @Environment(IPDashboardViewModel.self) private var viewModel
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         @Bindable var vm = viewModel
@@ -21,12 +22,18 @@ struct DashboardView: View {
                             Text(tab.title)
                                 .font(.caption2)
                         }
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, minHeight: 40)
                         .padding(.vertical, 8)
-                        .foregroundStyle(viewModel.currentTab == tab ? .primary : .secondary)
                         .background(viewModel.currentTab == tab ? Color.accentColor.opacity(0.1) : .clear)
+                        .contentShape(Rectangle())
+                        .interactiveForeground(
+                            idle: viewModel.currentTab == tab ? .primary : .secondary,
+                            hover: .accentColor,
+                            pressed: .accentColor
+                        )
                     }
-                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity)
+                    .buttonStyle(InteractiveButtonStyle(cornerRadius: 10))
                 }
             }
             .padding(.top, 4)
@@ -40,31 +47,46 @@ struct DashboardView: View {
                     dashboardContent
                 case .history:
                     HistoryListView()
-                case .settings:
-                    SettingsContainerView()
                 }
             }
-            .frame(minHeight: 300)
+            .frame(height: 380)
 
             Divider()
 
             // Footer
             HStack {
-                Text("Updated: \(viewModel.relativeLastUpdated)")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
                 Spacer()
-                Button("Quit") {
-                    NSApplication.shared.terminate(nil)
+                BuyMeCoffeeButton(compact: true)
+                Button {
+                    openWindow(id: "settings")
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+                } label: {
+                    Text("Settings")
+                        .font(.caption)
+                        .interactiveForeground(idle: .secondary, hover: .accentColor, pressed: .accentColor)
                 }
-                .font(.caption)
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
+                .buttonStyle(InteractiveButtonStyle())
+                Button {
+                    NSApplication.shared.terminate(nil)
+                } label: {
+                    Text("Quit")
+                        .font(.caption)
+                        .interactiveForeground(idle: .secondary, hover: .accentColor, pressed: .accentColor)
+                }
+                .buttonStyle(InteractiveButtonStyle())
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
         }
         .frame(width: 320)
+        .onAppear {
+            viewModel.currentTab = .dashboard
+            if let lastUpdated = viewModel.lastUpdated,
+               Date().timeIntervalSince(lastUpdated) < 30 {
+                return
+            }
+            Task { await viewModel.refresh() }
+        }
     }
 
     private var dashboardContent: some View {
@@ -88,7 +110,7 @@ struct DashboardView: View {
                                 value: viewModel.isLoading
                             )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(InteractiveButtonStyle())
                     .disabled(viewModel.isLoading)
                 }
 
@@ -104,7 +126,7 @@ struct DashboardView: View {
                     ip: viewModel.publicIP,
                     geoLocation: viewModel.geoLocation,
                     isLoading: viewModel.isLoading,
-                    copiedText: viewModel.copiedText,
+                    copiedItemID: viewModel.copiedItemID,
                     onCopy: viewModel.copyToClipboard
                 )
 
@@ -112,7 +134,7 @@ struct DashboardView: View {
                 if !viewModel.localInterfaces.isEmpty {
                     LocalIPCardView(
                         interfaces: viewModel.localInterfaces,
-                        copiedText: viewModel.copiedText,
+                        copiedItemID: viewModel.copiedItemID,
                         onCopy: viewModel.copyToClipboard
                     )
                 }

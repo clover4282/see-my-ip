@@ -36,22 +36,6 @@ enum IPDisplayFormat: String, CaseIterable {
     }
 }
 
-enum CountryDisplayFormat: String, CaseIterable {
-    case hidden = "hidden"
-    case emojiFlag = "emojiFlag"
-    case countryCode = "countryCode"
-    case countryName = "countryName"
-
-    var displayName: String {
-        switch self {
-        case .hidden: return "Hidden"
-        case .emojiFlag: return "Emoji Flag"
-        case .countryCode: return "Country Code"
-        case .countryName: return "Country Name"
-        }
-    }
-}
-
 enum RefreshInterval: Int, CaseIterable {
     case off = 0
     case oneMinute = 60

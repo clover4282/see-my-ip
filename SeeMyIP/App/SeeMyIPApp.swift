@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct SeeMyIPApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    private static let settingsWindowID = "settings"
     @State private var viewModel = IPDashboardViewModel()
 
     var body: some Scene {
@@ -9,18 +11,17 @@ struct SeeMyIPApp: App {
             DashboardView()
                 .environment(viewModel)
         } label: {
-            HStack(spacing: 4) {
-                if viewModel.showsMenuBarIcon {
-                    Image(systemName: viewModel.menuBarIcon)
-                }
-
-                if !viewModel.menuBarTitle.isEmpty {
-                    Text(viewModel.menuBarTitle)
-                        .font(.system(.caption, design: .monospaced))
-                        .fontWeight(.semibold)
-                }
-            }
+            Text(viewModel.menuBarTitle)
+                .font(.system(.caption, design: .monospaced))
+                .fontWeight(.semibold)
         }
         .menuBarExtraStyle(.window)
+
+        Window("Settings", id: Self.settingsWindowID) {
+            SettingsContainerView()
+                .environment(viewModel)
+                .frame(width: 360)
+        }
+        .windowResizability(.contentSize)
     }
 }

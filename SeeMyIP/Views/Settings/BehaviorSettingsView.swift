@@ -22,12 +22,14 @@ struct BehaviorSettingsView: View {
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
+                .interactiveControlHover(cornerRadius: 8, baseTint: .primary, hoverTint: .accentColor)
                 .onChange(of: refreshInterval) {
                     viewModel.startAutoRefresh()
                 }
             }
 
             Toggle("Start at Login", isOn: $startAtLogin)
+                .interactiveControlHover(cornerRadius: 8, baseTint: .primary, hoverTint: .accentColor)
                 .onChange(of: startAtLogin) { _, newValue in
                     viewModel.updateLoginItem(enabled: newValue)
                 }

@@ -13,18 +13,9 @@ enum CountryFlagMapper {
         return flag
     }
 
-    static func formattedCountry(country: String?, countryCode: String?, style: CountryDisplayFormat) -> String? {
-        switch style {
-        case .hidden:
-            return nil
-        case .emojiFlag:
-            guard let countryCode else { return nil }
-            let emojiFlag = flag(for: countryCode)
-            return emojiFlag.isEmpty ? countryCode.uppercased() : emojiFlag
-        case .countryCode:
-            return countryCode?.uppercased()
-        case .countryName:
-            return country
-        }
+    static func displayText(for countryCode: String?) -> String? {
+        guard let countryCode else { return nil }
+        let emojiFlag = flag(for: countryCode)
+        return emojiFlag.isEmpty ? countryCode.uppercased() : emojiFlag
     }
 }

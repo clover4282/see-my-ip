@@ -1,19 +1,13 @@
 import SwiftUI
 
 struct GeoLocationView: View {
-    @AppStorage(Constants.UserDefaultsKeys.countryFormat) private var countryFormat = "emojiFlag"
     let location: GeoLocation
 
     var body: some View {
-        let style = CountryDisplayFormat(rawValue: countryFormat) ?? .emojiFlag
-
-        if let countryText = CountryFlagMapper.formattedCountry(
-            country: location.country,
-            countryCode: location.countryCode,
-            style: style
-        ) {
+        if let countryText = CountryFlagMapper.displayText(for: location.countryCode) {
             HStack(spacing: 4) {
                 Text(countryText)
+                    .help(location.country)
                 if !location.city.isEmpty {
                     Text("\u{00B7}")
                     Text(location.city)

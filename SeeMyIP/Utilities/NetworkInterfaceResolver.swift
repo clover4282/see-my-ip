@@ -2,7 +2,7 @@ import Foundation
 
 enum NetworkInterfaceResolver {
     private static let hiddenPrefixes = [
-        "bridge", "ap", "awdl", "llw", "anpi", "gif", "stf", "XHC", "pktap"
+        "ap", "awdl", "llw", "anpi", "gif", "stf", "XHC", "pktap"
     ]
 
     static var isHidden: (String) -> Bool = { name in
@@ -21,6 +21,10 @@ enum NetworkInterfaceResolver {
             return .vpn
         case let n where n.hasPrefix("pdp_ip"):
             return .cellular
+        case let n where n.hasPrefix("bridge") || n.hasPrefix("vmnet"):
+            return .bridge
+        case "lo0":
+            return .loopback
         default:
             return .other
         }

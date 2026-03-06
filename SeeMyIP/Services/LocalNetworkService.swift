@@ -85,9 +85,7 @@ final class LocalNetworkService {
                                &hostname, socklen_t(hostname.count),
                                nil, 0, NI_NUMERICHOST) == 0 {
                     let ip = String(cString: hostname)
-                    if ip != "127.0.0.1" {
-                        addressMap[name, default: (nil, nil)].ipv4 = ip
-                    }
+                    addressMap[name, default: (nil, nil)].ipv4 = ip
                 }
             } else if family == UInt8(AF_INET6) {
                 var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
@@ -95,7 +93,7 @@ final class LocalNetworkService {
                                &hostname, socklen_t(hostname.count),
                                nil, 0, NI_NUMERICHOST) == 0 {
                     let ip = String(cString: hostname)
-                    if !ip.hasPrefix("fe80") && ip != "::1" {
+                    if !ip.hasPrefix("fe80") {
                         addressMap[name, default: (nil, nil)].ipv6 = ip
                     }
                 }
@@ -115,7 +113,7 @@ final class LocalNetworkService {
         }
 
         return interfaces.sorted { lhs, rhs in
-            let order: [NetworkInterfaceType] = [.wifi, .ethernet, .vpn, .cellular, .other]
+            let order: [NetworkInterfaceType] = [.wifi, .ethernet, .vpn, .cellular, .bridge, .other, .loopback]
             let lhsIdx = order.firstIndex(of: lhs.type) ?? order.count
             let rhsIdx = order.firstIndex(of: rhs.type) ?? order.count
             return lhsIdx < rhsIdx
