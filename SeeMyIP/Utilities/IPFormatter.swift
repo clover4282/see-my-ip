@@ -1,4 +1,5 @@
 import Foundation
+import Network
 
 enum IPFormatter {
     static func format(_ ip: String, style: IPDisplayFormat) -> String {
@@ -30,19 +31,34 @@ enum IPFormatter {
     }
 
     private static func formatIPv6(_ ip: String, style: IPDisplayFormat) -> String {
-        let segments = ip.split(separator: ":")
-        guard segments.count >= 3 else { return ip }
         switch style {
         case .full:
             return ip
         case .hidden:
             return "****:****:****:****"
         case .firstTwo:
-            return "\(segments[0]):\(segments[1]):..."
+            guard let segments = normalizedIPv6Segments(for: ip) else { return ip }
+            let first = segments.prefix(2).joined(separator: ":")
+            return "\(first):..."
         case .lastTwo:
-            return "...:\(segments[segments.count - 2]):\(segments.last ?? "")"
+            guard let segments = normalizedIPv6Segments(for: ip) else { return ip }
+            let last = segments.suffix(2).joined(separator: ":")
+            return "...:\(last)"
         case .firstAndLast:
-            return "\(segments[0]):...:\(segments.last ?? "")"
+            guard let segments = normalizedIPv6Segments(for: ip) else { return ip }
+            return "\(segments.first ?? ""):...:\(segments.last ?? "")"
+        }
+    }
+
+    private static func normalizedIPv6Segments(for ip: String) -> [String]? {
+        guard let address = IPv6Address(ip) else { return nil }
+
+        let bytes = Array(address.rawValue)
+        guard bytes.count == 16 else { return nil }
+
+        return stride(from: 0, to: bytes.count, by: 2).map { index in
+            let value = (UInt16(bytes[index]) << 8) | UInt16(bytes[index + 1])
+            return String(value, radix: 16)
         }
     }
 }

@@ -10,7 +10,7 @@ struct GitHubRelease: Decodable {
     }
 }
 
-enum UpdateCheckResult {
+enum UpdateCheckResult: Sendable {
     case upToDate
     case newVersion(version: String, url: URL)
     case error(String)

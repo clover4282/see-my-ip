@@ -127,21 +127,24 @@ struct HistoryRow: View {
     @ViewBuilder
     private var metadataView: some View {
         if let endTimestamp {
-            Text("\(Self.timestampFormatter.string(from: entry.timestamp)) · active \(durationText(until: endTimestamp))")
+            Text("\(Self.timestampFormatter.string(from: entry.timestamp)) · active \(durationText(until: endTimestamp, isCurrent: false))")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         } else {
             TimelineView(.periodic(from: .now, by: 60)) { context in
-                Text("\(Self.timestampFormatter.string(from: entry.timestamp)) · active \(durationText(until: context.date))")
+                Text("\(Self.timestampFormatter.string(from: entry.timestamp)) · active \(durationText(until: context.date, isCurrent: true))")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
         }
     }
 
-    private func durationText(until endDate: Date) -> String {
+    private func durationText(until endDate: Date, isCurrent: Bool) -> String {
         let interval = max(0, endDate.timeIntervalSince(entry.timestamp))
-        return Self.durationFormatter.string(from: interval) ?? "0s"
+        if let duration = Self.durationFormatter.string(from: interval) {
+            return duration
+        }
+        return isCurrent ? "now" : "< 1m"
     }
 
     private func formattedIP(_ ip: String) -> String {

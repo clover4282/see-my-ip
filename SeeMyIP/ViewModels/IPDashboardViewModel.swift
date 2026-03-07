@@ -52,6 +52,7 @@ final class IPDashboardViewModel {
 
     private var refreshTask: Task<Void, Never>?
     private var networkDebounceTask: Task<Void, Never>?
+    private var copyResetTask: Task<Void, Never>?
     @ObservationIgnored private var defaultsObserver: Any?
 
     // MARK: - Menu Bar
@@ -86,10 +87,10 @@ final class IPDashboardViewModel {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.networkDebounceTask?.cancel()
-                self.networkDebounceTask = Task {
+                self.networkDebounceTask = Task { [weak self] in
                     try? await Task.sleep(for: .seconds(2))
                     guard !Task.isCancelled else { return }
-                    await self.refresh()
+                    await self?.refresh()
                 }
             }
         }
@@ -116,9 +117,10 @@ final class IPDashboardViewModel {
         isLoading = true
         errorMessage = nil
 
+        let networkStatus = localNetworkService.currentStatus()
         localInterfaces = localNetworkService.getLocalInterfaces()
-        networkType = localNetworkService.currentNetworkType
-        isConnected = localNetworkService.isConnected
+        networkType = networkStatus.networkType
+        isConnected = networkStatus.isConnected
         isVPNActive = localNetworkService.isVPNActive
 
         guard isConnected else {
@@ -162,15 +164,19 @@ final class IPDashboardViewModel {
         }
 
         isLoading = false
-        lastUpdated = Date()
+        if errorMessage == nil {
+            lastUpdated = Date()
+        }
     }
 
     func copyToClipboard(_ text: String, itemID: String? = nil) {
         ClipboardService.copy(text)
         let copiedID = itemID ?? text
         copiedItemID = copiedID
-        Task {
+        copyResetTask?.cancel()
+        copyResetTask = Task {
             try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
             if copiedItemID == copiedID {
                 copiedItemID = nil
             }

@@ -7,7 +7,7 @@ import SwiftUI
 struct SettingsContainerView: View {
     @State private var updateResult: UpdateCheckResult?
     @State private var isCheckingUpdate = false
-    private let updateService = UpdateService()
+    private static let updateService = UpdateService()
 
     var body: some View {
         ScrollView {
@@ -33,7 +33,7 @@ struct SettingsContainerView: View {
                             isCheckingUpdate = true
                             updateResult = nil
                             Task {
-                                let result = await updateService.checkForUpdates()
+                                let result = await Self.updateService.checkForUpdates()
                                 isCheckingUpdate = false
                                 updateResult = result
                             }

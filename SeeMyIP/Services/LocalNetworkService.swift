@@ -2,12 +2,18 @@ import Foundation
 import Network
 
 final class LocalNetworkService {
+    struct NetworkStatusSnapshot {
+        let isConnected: Bool
+        let networkType: NetworkInterfaceType
+    }
+
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "com.seemyip.networkmonitor")
 
     var onNetworkChange: (() -> Void)?
-    private(set) var isConnected: Bool = false
+    private var isConnected: Bool = false
     private var currentPath: NWPath?
+    private let lock = NSLock()
 
     init() {
         startMonitoring()
@@ -16,15 +22,27 @@ final class LocalNetworkService {
     private func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self else { return }
+            self.lock.lock()
             self.currentPath = path
             self.isConnected = path.status == .satisfied
+            self.lock.unlock()
             self.onNetworkChange?()
         }
         monitor.start(queue: queue)
     }
 
-    var currentNetworkType: NetworkInterfaceType {
-        guard let path = currentPath, path.status == .satisfied else { return .none }
+    func currentStatus() -> NetworkStatusSnapshot {
+        lock.lock()
+        defer { lock.unlock() }
+
+        return NetworkStatusSnapshot(
+            isConnected: isConnected,
+            networkType: Self.networkType(for: currentPath)
+        )
+    }
+
+    private static func networkType(for path: NWPath?) -> NetworkInterfaceType {
+        guard let path, path.status == .satisfied else { return .none }
         if path.usesInterfaceType(.wifi) { return .wifi }
         if path.usesInterfaceType(.wiredEthernet) { return .ethernet }
         if path.usesInterfaceType(.cellular) { return .cellular }

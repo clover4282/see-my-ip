@@ -7,7 +7,10 @@ final class GeoLocationService {
     }
 
     func lookup(ip: String) async throws -> GeoLocation {
-        let url = URL(string: Constants.API.ipApiGeoURL + ip)!
+        guard let encoded = ip.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
+              let url = URL(string: Constants.API.ipApiGeoURL + encoded) else {
+            throw GeoError.lookupFailed
+        }
         let (data, response) = try await URLSession.shared.data(from: url)
         guard (response as? HTTPURLResponse)?.statusCode == 200 else {
             throw GeoError.lookupFailed

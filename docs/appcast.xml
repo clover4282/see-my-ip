@@ -6,6 +6,27 @@
     <description>See My IP update feed</description>
     <language>en</language>
     <item>
+      <title>v0.2</title>
+      <pubDate>Sat, 07 Mar 2026 10:48:53 +0900</pubDate>
+      <sparkle:version>2</sparkle:version>
+      <sparkle:shortVersionString>0.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[
+        <h2>See My IP v0.2</h2>
+        <p>Automatic updates, a new app icon, and stability fixes.</p>
+        <ul>
+          <li>Sparkle-based automatic update support with signed releases</li>
+          <li>Updated app icon across the macOS app bundle</li>
+          <li>More consistent network refresh state after connectivity changes</li>
+          <li>Corrected short history durations and compressed IPv6 masking</li>
+        </ul>
+      ]]></description>
+      <enclosure url="https://github.com/clover4282/see-my-ip/releases/download/v0.2/SeeMyIP-v0.2.zip"
+                 type="application/octet-stream"
+                 length="4828364"
+                 sparkle:edSignature="j0o8LkeoPIc9ZbfbhhTeCPDW/Mv3SJegn6vhC1wx9FXo3alkGoQytWsaSx0NUgu0PuYS1yij7cXRmo+5J5QbCA==" />
+    </item>
+    <item>
       <title>v0.1</title>
       <pubDate>Fri, 07 Mar 2026 00:00:00 +0900</pubDate>
       <sparkle:version>1</sparkle:version>
