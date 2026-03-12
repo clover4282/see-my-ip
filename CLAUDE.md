@@ -20,14 +20,22 @@ Direct xcodebuild: `xcodebuild -scheme SeeMyIP -configuration Debug build`
 
 ## Release Workflow
 
+One command to deploy everything:
+
+```bash
+make deploy V=0.4   # bump → build → sign → appcast → commit → release → push
+```
+
+This runs the full pipeline: version bump, Release build, Sparkle EdDSA signing, appcast.xml update, git commit, GitHub Release creation, and push.
+
+Individual steps are also available:
+
 ```bash
 make bump V=0.2     # Update version in Info.plist
 make sign           # Build Release, zip, sign with Sparkle EdDSA
-make appcast        # Print appcast.xml <item> template (copy into docs/appcast.xml)
+make appcast        # Print appcast.xml <item> template
 make dist TAG=v0.2  # Create GitHub Release with signed zip
 ```
-
-After `make dist`, update `docs/appcast.xml` with the new `<item>` from `make appcast`, commit, and push to update GitHub Pages.
 
 ## Architecture
 

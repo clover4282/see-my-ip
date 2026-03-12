@@ -7,7 +7,7 @@ VERSION = $(shell /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" 
 BUILD_NUMBER = $(shell /usr/libexec/PlistBuddy -c "Print CFBundleVersion" SeeMyIP/Resources/Info.plist)
 ZIP_NAME = $(SCHEME)-v$(VERSION).zip
 
-.PHONY: build release run kill rerun clean sign appcast bump help
+.PHONY: build release run kill rerun clean sign appcast bump deploy help
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -77,6 +77,39 @@ bump: ## Bump version (usage: make bump V=0.2)
 	/usr/libexec/PlistBuddy -c "Set CFBundleShortVersionString $(V)" SeeMyIP/Resources/Info.plist && \
 	/usr/libexec/PlistBuddy -c "Set CFBundleVersion $$build" SeeMyIP/Resources/Info.plist && \
 	echo "Version bumped to $(V) ($$build)"
+
+deploy: ## Full deploy: bump → build → sign → appcast → commit → release → push (usage: make deploy V=0.4)
+	@if [ -z "$(V)" ]; then echo "Usage: make deploy V=0.x"; exit 1; fi
+	@echo "▶ Bump version to $(V)"
+	@$(MAKE) -s bump V=$(V)
+	@echo "▶ Build & zip release"
+	@$(MAKE) -s zip
+	@echo "▶ Sign & update appcast.xml"
+	@SIGN=$$($(SPARKLE_BIN)/sign_update /tmp/SeeMyIP-v$(V).zip) && \
+	BUILD=$$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" SeeMyIP/Resources/Info.plist) && \
+	PUBDATE=$$(date -R) && \
+	awk -v sign="$$SIGN" -v build="$$BUILD" -v ver="$(V)" -v pubdate="$$PUBDATE" \
+		'/<language>en<\/language>/{ print; \
+		print "    <item>"; \
+		print "      <title>v" ver "</title>"; \
+		print "      <pubDate>" pubdate "</pubDate>"; \
+		print "      <sparkle:version>" build "</sparkle:version>"; \
+		print "      <sparkle:shortVersionString>" ver "</sparkle:shortVersionString>"; \
+		print "      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>"; \
+		print "      <enclosure url=\"https://github.com/clover4282/see-my-ip/releases/download/v" ver "/SeeMyIP-v" ver ".zip\""; \
+		print "                 type=\"application/octet-stream\""; \
+		print "                 " sign " />"; \
+		print "    </item>"; next} {print}' \
+		docs/appcast.xml > docs/appcast.xml.tmp && \
+	mv docs/appcast.xml.tmp docs/appcast.xml
+	@echo "▶ Commit"
+	@git add SeeMyIP/Resources/Info.plist docs/appcast.xml
+	@git commit -m "Release v$(V)"
+	@echo "▶ GitHub Release"
+	@gh release create v$(V) /tmp/SeeMyIP-v$(V).zip --title "v$(V)" --notes "See My IP v$(V)"
+	@echo "▶ Push"
+	@git push
+	@echo "✅ v$(V) deployed!"
 
 info: ## Show current build info
 	@echo "Version:    $(VERSION)"
