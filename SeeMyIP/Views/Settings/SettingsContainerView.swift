@@ -25,7 +25,26 @@ struct SettingsContainerView: View {
                     HStack(spacing: 12) {
                         #if canImport(Sparkle)
                         Button("Check for Updates") {
-                            AppDelegate.updater?.checkForUpdates()
+                            guard let updater = AppDelegate.updater else { return }
+                            NSApp.setActivationPolicy(.regular)
+
+                            let settingsWindow = NSApp.keyWindow
+                            settingsWindow?.level = .normal
+
+                            NSApp.activate(ignoringOtherApps: true)
+                            updater.checkForUpdates()
+
+                            Task {
+                                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                                for _ in 0..<60 {
+                                    guard updater.sessionInProgress else { break }
+                                    try? await Task.sleep(nanoseconds: 500_000_000)
+                                }
+                                await MainActor.run {
+                                    settingsWindow?.level = .floating
+                                    NSApp.setActivationPolicy(.accessory)
+                                }
+                            }
                         }
                         .buttonStyle(InteractiveButtonStyle())
                         #else
