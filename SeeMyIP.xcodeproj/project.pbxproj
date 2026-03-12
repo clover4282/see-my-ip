@@ -41,6 +41,7 @@
 		EF2065D8F628B6328BA6FCEB /* GeoLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94EDEB8ED052C59CAE909F54 /* GeoLocationService.swift */; };
 		FAF3D77A42B4D8987BEDF507 /* NetworkStatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38A54571744068FD6C97A904 /* NetworkStatusBadge.swift */; };
 		F1A2B3C4D5E6F7081234ABCD /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70812340001 /* UpdateService.swift */; };
+		CC1122334455667788990011 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA1122334455667788990011 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -221,12 +222,25 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		EE1122334455667788990011 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC1122334455667788990011 /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+
 /* Begin PBXNativeTarget section */
 		BE87657698EDF6378D7DF907 /* SeeMyIP */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BEAE480FB549BACB2D4EE0BD /* Build configuration list for PBXNativeTarget "SeeMyIP" */;
 			buildPhases = (
 				7DD35F7892042B9B4389AD38 /* Sources */,
+				EE1122334455667788990011 /* Frameworks */,
 				55F9F9947DDAE648A7730F80 /* Resources */,
 			);
 			buildRules = (

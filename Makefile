@@ -13,10 +13,10 @@ help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
 
 build: ## Build Debug configuration
-	xcodebuild -scheme $(SCHEME) -configuration Debug build | tail -3
+	xcodebuild -project SeeMyIP.xcodeproj -scheme $(SCHEME) -configuration Debug build | tail -3
 
 release: ## Build Release configuration
-	xcodebuild -scheme $(SCHEME) -configuration Release build | tail -3
+	xcodebuild -project SeeMyIP.xcodeproj -scheme $(SCHEME) -configuration Release build | tail -3
 
 DEV_APP = $(SCHEME)-Dev
 
@@ -34,11 +34,11 @@ rerun: ## Kill and rerun the app
 	open "$(BUILD_DIR)/Debug/$(DEV_APP).app"
 
 clean: ## Clean build artifacts
-	xcodebuild -scheme $(SCHEME) clean | tail -3
+	xcodebuild -project SeeMyIP.xcodeproj -scheme $(SCHEME) clean | tail -3
 	rm -f /tmp/$(ZIP_NAME)
 
 resolve: ## Resolve SPM package dependencies
-	xcodebuild -scheme $(SCHEME) -resolvePackageDependencies | tail -5
+	xcodebuild -project SeeMyIP.xcodeproj -scheme $(SCHEME) -resolvePackageDependencies | tail -5
 
 zip: release ## Create release zip
 	cd "$(BUILD_DIR)/Release" && ditto -c -k --keepParent $(SCHEME).app /tmp/$(ZIP_NAME)

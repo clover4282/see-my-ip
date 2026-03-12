@@ -2,7 +2,7 @@ import Foundation
 
 enum NetworkInterfaceResolver {
     private static let hiddenPrefixes = [
-        "ap", "awdl", "llw", "anpi", "gif", "stf", "XHC", "pktap"
+        "ap", "awdl", "llw", "anpi", "gif", "stf", "XHC", "pktap", "lo"
     ]
 
     static var isHidden: (String) -> Bool = { name in

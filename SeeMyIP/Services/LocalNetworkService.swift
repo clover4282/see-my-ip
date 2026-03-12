@@ -134,7 +134,8 @@ final class LocalNetworkService {
             let order: [NetworkInterfaceType] = [.wifi, .ethernet, .vpn, .cellular, .bridge, .other, .loopback]
             let lhsIdx = order.firstIndex(of: lhs.type) ?? order.count
             let rhsIdx = order.firstIndex(of: rhs.type) ?? order.count
-            return lhsIdx < rhsIdx
+            if lhsIdx != rhsIdx { return lhsIdx < rhsIdx }
+            return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
         }
     }
 

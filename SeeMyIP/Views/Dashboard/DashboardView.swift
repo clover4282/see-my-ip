@@ -42,15 +42,13 @@ struct DashboardView: View {
             Divider()
 
             // Content
-            Group {
-                switch viewModel.currentTab {
-                case .dashboard:
-                    dashboardContent
-                case .history:
-                    HistoryListView()
-                }
+            switch viewModel.currentTab {
+            case .dashboard:
+                dashboardContent
+            case .history:
+                HistoryListView()
+                    .frame(height: 380)
             }
-            .frame(height: 380)
 
             Divider()
 
@@ -91,8 +89,7 @@ struct DashboardView: View {
     }
 
     private var dashboardContent: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 12) {
                 // Header
                 HStack {
                     Text("See My IP")
@@ -167,6 +164,5 @@ struct DashboardView: View {
                 }
             }
             .padding()
-        }
     }
 }
