@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct DashboardView: View {
@@ -97,6 +98,20 @@ struct DashboardView: View {
                     Text("See My IP")
                         .font(.headline)
                     Spacer()
+                    Button {
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.Network-Settings.extension") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    } label: {
+                        HStack(spacing: 3) {
+                            Image(systemName: "network")
+                            Text("Network Settings")
+                        }
+                        .font(.system(size: 11))
+                        .interactiveForeground(idle: .secondary, hover: .accentColor, pressed: .accentColor)
+                    }
+                    .buttonStyle(InteractiveButtonStyle())
+                    .help("Open Network Settings")
                     Button {
                         Task { await viewModel.refresh() }
                     } label: {

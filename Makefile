@@ -18,18 +18,20 @@ build: ## Build Debug configuration
 release: ## Build Release configuration
 	xcodebuild -scheme $(SCHEME) -configuration Release build | tail -3
 
+DEV_APP = $(SCHEME)-Dev
+
 run: build ## Build and run the app
-	@pkill -x $(SCHEME) 2>/dev/null || true
+	@pkill -x $(DEV_APP) 2>/dev/null || true
 	@sleep 1
-	open "$(BUILD_DIR)/Debug/$(SCHEME).app"
+	open "$(BUILD_DIR)/Debug/$(DEV_APP).app"
 
 kill: ## Kill running app
-	@pkill -x $(SCHEME) 2>/dev/null && echo "$(SCHEME) killed" || echo "$(SCHEME) not running"
+	@pkill -x $(DEV_APP) 2>/dev/null && echo "$(DEV_APP) killed" || echo "$(DEV_APP) not running"
 
 rerun: ## Kill and rerun the app
-	@pkill -x $(SCHEME) 2>/dev/null || true
+	@pkill -x $(DEV_APP) 2>/dev/null || true
 	@sleep 1
-	open "$(BUILD_DIR)/Debug/$(SCHEME).app"
+	open "$(BUILD_DIR)/Debug/$(DEV_APP).app"
 
 clean: ## Clean build artifacts
 	xcodebuild -scheme $(SCHEME) clean | tail -3

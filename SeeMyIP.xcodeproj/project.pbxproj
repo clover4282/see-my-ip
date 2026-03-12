@@ -489,8 +489,8 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.clover4282.seemyip;
-				PRODUCT_NAME = SeeMyIP;
+				PRODUCT_BUNDLE_IDENTIFIER = com.clover4282.seemyip.dev;
+				PRODUCT_NAME = "SeeMyIP-Dev";
 				SDKROOT = macosx;
 			};
 			name = Debug;
