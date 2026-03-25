@@ -6,6 +6,16 @@
     <description>See My IP update feed</description>
     <language>en</language>
     <item>
+      <title>v0.9</title>
+      <pubDate>Wed, 25 Mar 2026 10:14:04 +0900</pubDate>
+      <sparkle:version>9</sparkle:version>
+      <sparkle:shortVersionString>0.9</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/clover4282/see-my-ip/releases/download/v0.9/SeeMyIP-v0.9.zip"
+                 type="application/octet-stream"
+                 sparkle:edSignature="NR3Ap1Mx9Pr9dzHI7YwlWaW5AbDMCEf/DuY5mh+rBdIJH4/30BQraB3BKPsCiMcTTNTIJGsYxIOs35KtryVdAw==" length="5814044" />
+    </item>
+    <item>
       <title>v0.8</title>
       <pubDate>Thu, 12 Mar 2026 14:52:09 +0900</pubDate>
       <sparkle:version>8</sparkle:version>
