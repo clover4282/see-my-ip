@@ -105,10 +105,10 @@ deploy: ## Full deploy: bump → build → sign → appcast → commit → relea
 	@echo "▶ Commit"
 	@git add SeeMyIP/Resources/Info.plist docs/appcast.xml
 	@git commit -m "Release v$(V)"
-	@echo "▶ GitHub Release"
-	@gh release create v$(V) /tmp/SeeMyIP-v$(V).zip --title "v$(V)" --notes "See My IP v$(V)"
 	@echo "▶ Push"
 	@git push
+	@echo "▶ GitHub Release"
+	@gh release create v$(V) /tmp/SeeMyIP-v$(V).zip --title "v$(V)" --notes "See My IP v$(V)"
 	@echo "✅ v$(V) deployed!"
 
 info: ## Show current build info

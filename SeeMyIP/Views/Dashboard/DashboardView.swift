@@ -80,10 +80,6 @@ struct DashboardView: View {
         .frame(width: 320)
         .onAppear {
             viewModel.currentTab = .dashboard
-            if let lastUpdated = viewModel.lastUpdated,
-               Date().timeIntervalSince(lastUpdated) < 30 {
-                return
-            }
             Task { await viewModel.refresh() }
         }
     }

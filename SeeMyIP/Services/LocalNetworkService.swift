@@ -1,5 +1,6 @@
 import Foundation
 import Network
+import SystemConfiguration
 
 final class LocalNetworkService {
     struct NetworkStatusSnapshot {
@@ -16,6 +17,11 @@ final class LocalNetworkService {
     private let lock = NSLock()
 
     init() {
+#if DEBUG
+        let wifi = NetworkInterface(name: "en0", type: .wifi, displayName: "Wi-Fi (en0)", ipv4Address: "10.0.0.1", ipv6Address: nil)
+        let ethernet = NetworkInterface(name: "en9", type: .ethernet, displayName: "Ethernet (en9)", ipv4Address: "192.168.0.1", ipv6Address: nil)
+        assert(Self.sortedInterfaces([wifi, ethernet], serviceOrder: ["en9", "en0"]).first?.name == "en9")
+#endif
         startMonitoring()
     }
 
@@ -23,10 +29,15 @@ final class LocalNetworkService {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self else { return }
             self.lock.lock()
+            let oldConnected = self.isConnected
+            let oldType = Self.networkType(for: self.currentPath)
             self.currentPath = path
             self.isConnected = path.status == .satisfied
+            let changed = (oldConnected != self.isConnected) || (oldType != Self.networkType(for: path))
             self.lock.unlock()
-            self.onNetworkChange?()
+            if changed {
+                self.onNetworkChange?()
+            }
         }
         monitor.start(queue: queue)
     }
@@ -130,7 +141,34 @@ final class LocalNetworkService {
             ))
         }
 
+        return Self.sortedInterfaces(interfaces, serviceOrder: networkServiceOrder())
+    }
+
+    private func networkServiceOrder() -> [String] {
+        guard let preferences = SCPreferencesCreate(nil, "SeeMyIP" as CFString, nil),
+              let networkSet = SCNetworkSetCopyCurrent(preferences),
+              let serviceIDs = SCNetworkSetGetServiceOrder(networkSet) as? [String],
+              let services = SCNetworkSetCopyServices(networkSet) as? [SCNetworkService] else {
+            return []
+        }
+
+        let servicesByID = Dictionary(uniqueKeysWithValues: services.compactMap { service in
+            (SCNetworkServiceGetServiceID(service) as String?).map { ($0, service) }
+        })
+
+        return serviceIDs.compactMap { serviceID in
+            servicesByID[serviceID]
+                .flatMap(SCNetworkServiceGetInterface)
+                .flatMap { SCNetworkInterfaceGetBSDName($0) as String? }
+        }
+    }
+
+    private static func sortedInterfaces(_ interfaces: [NetworkInterface], serviceOrder: [String]) -> [NetworkInterface] {
         return interfaces.sorted { lhs, rhs in
+            let lhsPriority = serviceOrder.firstIndex(of: lhs.name) ?? serviceOrder.endIndex
+            let rhsPriority = serviceOrder.firstIndex(of: rhs.name) ?? serviceOrder.endIndex
+            if lhsPriority != rhsPriority { return lhsPriority < rhsPriority }
+
             let order: [NetworkInterfaceType] = [.wifi, .ethernet, .vpn, .cellular, .bridge, .other, .loopback]
             let lhsIdx = order.firstIndex(of: lhs.type) ?? order.count
             let rhsIdx = order.firstIndex(of: rhs.type) ?? order.count

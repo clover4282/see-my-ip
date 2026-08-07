@@ -72,11 +72,15 @@ final class IPDashboardViewModel {
         }
     }
 
-    var relativeLastUpdated: String {
-        guard let date = lastUpdated else { return "Never" }
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short
-        return formatter.localizedString(for: date, relativeTo: Date())
+        return formatter
+    }()
+
+    var relativeLastUpdated: String {
+        guard let date = lastUpdated else { return "Never" }
+        return Self.relativeFormatter.localizedString(for: date, relativeTo: Date())
     }
 
     // MARK: - Init
@@ -106,8 +110,14 @@ final class IPDashboardViewModel {
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                self.menuBarDisplayModeValue = UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.menuBarDisplayMode) ?? "icon"
-                self.menuBarLocalInterfaceValue = UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.menuBarLocalInterface) ?? Constants.Defaults.autoLocalInterface
+                let newDisplayMode = UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.menuBarDisplayMode) ?? "icon"
+                let newInterface = UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.menuBarLocalInterface) ?? Constants.Defaults.autoLocalInterface
+                if self.menuBarDisplayModeValue != newDisplayMode {
+                    self.menuBarDisplayModeValue = newDisplayMode
+                }
+                if self.menuBarLocalInterfaceValue != newInterface {
+                    self.menuBarLocalInterfaceValue = newInterface
+                }
             }
         }
     }
@@ -143,7 +153,7 @@ final class IPDashboardViewModel {
                 geoLocation = try? await geoLocationService.lookup(ip: newIP)
             }
 
-            if let oldIP, newIP != oldIP {
+            if newIP != oldIP {
                 let entry = IPHistoryEntry(
                     ip: newIP,
                     previousIP: oldIP,
@@ -154,9 +164,11 @@ final class IPDashboardViewModel {
                 historyService.addEntry(entry)
                 history = historyService.getHistory()
 
-                let shouldNotify = UserDefaults.standard.bool(forKey: Constants.UserDefaultsKeys.notifyOnIPChange)
-                if shouldNotify {
-                    NotificationService.shared.sendIPChangeNotification(oldIP: oldIP, newIP: newIP)
+                if let oldIP {
+                    let shouldNotify = UserDefaults.standard.bool(forKey: Constants.UserDefaultsKeys.notifyOnIPChange)
+                    if shouldNotify {
+                        NotificationService.shared.sendIPChangeNotification(oldIP: oldIP, newIP: newIP)
+                    }
                 }
             }
         } catch {

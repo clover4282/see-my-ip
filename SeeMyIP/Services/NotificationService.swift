@@ -6,7 +6,7 @@ final class NotificationService {
     private init() {}
 
     func requestPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
     }
 
     func sendIPChangeNotification(oldIP: String, newIP: String) {
